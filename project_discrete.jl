@@ -40,23 +40,33 @@ mutable struct State
     occupiedRooms::Int64
     totalRooms::Int64
 
+    t::Float64
+
     # Queues 
-    urgentQ::Queue{Int32}
-    normalQ::Queue{Int32}
-    lowQ::Queue{Int32}
+    urgentQ::PriorityQueue{Event,Float64}
+    normalQ::PriorityQueue{Event,Float64}
+    lowQ::PriorityQueue{Event,Float64}
 
     # Simulation variables - USE OR REDEFINE? 
-    t::Float64
-    queue::PriorityQueue{Event,Float64}
-    nextID::Int32
+    
+    #nextID::Int32
+
     # Output
-    log_urgentQ::Array{Tuple{Int32,Float64}}
-    log_normalQ::Array{Tuple{Int32,Float64}}
-    log_lowQ::Array{Tuple{Int32,Float64}}
-    log_arrival::Array{Float64} # ? 
-    log_departureH::Array{Float64}
+    # log_urgentQ::Array{Tuple{Int32,Float64}}
+    # log_normalQ::Array{Tuple{Int32,Float64}}
+    # log_lowQ::Array{Tuple{Int32,Float64}}
+    # log_arrival::Array{Float64} # ? 
+    # log_departureH::Array{Float64}
 
     # Constructor state missing
-    # State() = new(...)
+    State() = new(0,0,0,
+        PriorityQueue{Event,Float64},
+        PriorityQueue{Event,Float64},
+        PriorityQueue{Event,Float64})
 end
 
+
+
+function main()
+    Random.seed!(1234)
+    

@@ -102,7 +102,7 @@ function process_move_doctor(env::Environment, state::State, patientID::Int32)
 end
 
 function process_departure_nurse(env::Environment, state::State)
-   # println(":DN at $(state.t)")
+    #println(":DN at $(state.t)")
     patientID = dequeue!(state.nurseQ)
     state.log_departure[patientID]=state.t
     if rand(env.needs_doctor_D)==1
@@ -128,6 +128,7 @@ end
 
 function simulate(env::Environment)
     state = State()
+    println(state)
     schedule_arrival(env,state)
     while !isempty(state.events)
         e = dequeue!(state.events)
@@ -170,3 +171,10 @@ function main()
 end
 
 main()
+# State(Queue{Int32}(Deque [Int32[]]), 
+#     Queue{Int32}(Deque [Int32[]]), 
+#     0.0, 
+#     PriorityQueue{Event, Float64, Base.Order.ForwardOrdering}(), 
+#     1, 
+#     Tuple{Int32, Float64}[(0, 0.0)], 
+#     Float64[], Float64[])
