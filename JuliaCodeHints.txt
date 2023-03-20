@@ -1,0 +1,58 @@
+Code hints
+_______________________________________________________________
+HOW TO CREATE A PATIENT
+
+We would like to store the patient type and arrival. A "Symbol" always starts with ":". You can for example use :High, :Normal, and :Low.
+
+The struct:
+struct Patient
+    type::Symbol
+    time::Float64 # of arrival
+end
+
+To create a new patient:
+arrivalTime = 2.5
+newPatient = Patient(:High, arrivalTime)
+
+________________________________________________________
+HOW TO STORE THE DIFFERENT QUEUES
+
+We have 3 queues
+You can store all three queues in an array called localQueue:
+
+Julia code:
+localQueue = PriorityQueue{Patient,Float64}[]
+
+Next, you can initialize these three empty queues:
+
+ for i= 1:nrPatientTypes
+    push!(localQueue, PriorityQueue{Patient,Float64}())
+ end
+ 
+Finally, you can add something to a queue, let's say the first queue, by:
+#The patient event:
+arrivalTimePatient = 2.5
+patientPriorityType= :High
+p = Patient(patientPriorityType, arrivalTimePatient)
+#adding the patient event
+enqueue!(localQueue[1], p , arrivalTimePatient)
+
+
+later, you can take something out of this queue by calling:
+dequeue!(localQueue[1])
+
+If you want to know the length of the queue, then:
+length(localQueue[1])
+
+________________________________________________________
+How to add a row to a matrix
+
+Use vcat()
+
+So imagine you have a= [1 2 3], and you want to add the numbers 4 5 and 6, you write:
+a = vcat(a, [4 5 6])
+
+now a= 
+1 2 3
+4 5 6
+
