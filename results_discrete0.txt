@@ -1,0 +1,98 @@
+nrServed 0
+Costs of Waiting 0.0
+Average Room Occupation: NaN
+Average Queue Length High: NaN
+Average Queue Length Normal: NaN
+Average Queue Length Low: NaN
+Average Waiting Time HighNaN
+Average Waiting Time NormalNaN
+Average Waiting Time LowNaN
+[0.0 0.0 0.0 0.0 0.0]
+-------------------------------
+Float64[]
+Float64[]
+Float64[]
+nrServed 0
+Costs of Waiting 0.0
+Average Room Occupation: NaN
+Average Queue Length High: NaN
+Average Queue Length Normal: NaN
+Average Queue Length Low: NaN
+Average Waiting Time HighNaN
+Average Waiting Time NormalNaN
+Average Waiting Time LowNaN
+[0.0 0.0 0.0 0.0 0.0]
+-------------------------------
+Float64[]
+Float64[]
+Float64[]
+nrServed 0
+Costs of Waiting 0.0
+Average Room Occupation: NaN
+Average Queue Length High: NaN
+Average Queue Length Normal: NaN
+Average Queue Length Low: NaN
+Average Waiting Time HighNaN
+Average Waiting Time NormalNaN
+Average Waiting Time LowNaN
+[0.0 0.0 0.0 0.0 0.0]
+-------------------------------
+Float64[]
+Float64[]
+Float64[]
+nrServed 0
+Costs of Waiting 0.0
+Average Room Occupation: NaN
+Average Queue Length High: NaN
+Average Queue Length Normal: NaN
+Average Queue Length Low: NaN
+Average Waiting Time HighNaN
+Average Waiting Time NormalNaN
+Average Waiting Time LowNaN
+[0.0 0.0 0.0 0.0 0.0]
+-------------------------------
+Float64[]
+Float64[]
+Float64[]
+nrServed 0
+Costs of Waiting 0.0
+Average Room Occupation: NaN
+Average Queue Length High: NaN
+Average Queue Length Normal: NaN
+Average Queue Length Low: NaN
+Average Waiting Time HighNaN
+Average Waiting Time NormalNaN
+Average Waiting Time LowNaN
+[0.0 0.0 0.0 0.0 0.0]
+-------------------------------
+Float64[]
+Float64[]
+Float64[]
+nrServed 0
+Costs of Waiting 0.0
+Average Room Occupation: NaN
+Average Queue Length High: NaN
+Average Queue Length Normal: NaN
+Average Queue Length Low: NaN
+Average Waiting Time HighNaN
+Average Waiting Time NormalNaN
+Average Waiting Time LowNaN
+[0.0 0.0 0.0 0.0 0.0]
+-------------------------------
+Float64[]
+Float64[]
+Float64[]
+nrServed 0
+Costs of Waiting 0.0
+Average Room Occupation: NaN
+Average Queue Length High: NaN
+Average Queue Length Normal: NaN
+Average Queue Length Low: NaN
+Average Waiting Time HighNaN
+Average Waiting Time NormalNaN
+Average Waiting Time LowNaN
+[0.0 0.0 0.0 0.0 0.0]
+-------------------------------
+Float64[]
+Float64[]
+Float64[]

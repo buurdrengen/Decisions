@@ -1,4 +1,4 @@
-module Hospital
+#module Hospital
 using Random, Distributions, DataStructures, Plots
 #You can use print-lines for debugging. When your code is done, you would like to be able to switch them off easily. 
 #Therefore, one can include a boolean "_debug" that is switched on when debugging, and off otherwise.
@@ -23,7 +23,6 @@ struct Environment
     serviceTime_patient::Float64
     nrRooms::Int64
     costWaitingPerHour::Matrix{Float64}
-
 end
 
 
@@ -38,6 +37,7 @@ end
 struct Patient
     type::Symbol
     time::Float64 # of arrival
+    #HospitalID::Symbol
 end
 
 
@@ -57,106 +57,149 @@ mutable struct State #for multiple hospitals, change below to matrices
     totalRooms::Int64 
 
     # IDs? 
-    queue::Vector{PriorityQueue{Patient,Float64}}  #Queue per priority level, priority level going down 
+    # localQueue? 
+    localQueue::Vector{PriorityQueue{Patient,Float64}}  #Queue per priority level, priority level going down 
     t::Float64
-    id::Int64
+    #id::Int64
 
+    # Events here? 
+
+    #State() = new(0, 7,Vector{PriorityQueue{Patient,Float64}}(),0) # ID ?  
 
 end
 
+function schedule_arrival(env::Environment,state::State)
+    tt = state.t + rand(Exponential(env.arrivalRate_patient))
+    if tt <= env.warmUpTime + env.timeHorizonH
+        probT = rand()
+        if probT <= 0.6
+            patient = Patient(:Normal,tt) 
+        elseif probT <= 0.9
+            patient = Patient(:Low,tt)
+        else 
+            patient = Patient(:High,tt)
+        end 
+        e = Event(:ArrivalPatient)
+    end
+end
 
 
 
 #TODO create this function
 function arrival_patient(patient::Patient, env::Environment, state::State, events::PriorityQueue{Event,Float64}, stats::SimStats, t::Float64)
-    if patient.type ==:High
+    # MISSING: 
+    # Use of environment - use it for nr.rooms? 
+    # Use of Events - enqueue into events instead of the localQueue? 
+    # patientID = state.id
+    # Check if time is over the time horizon.
+    
 
-        if isempty(state.loqalQueue[1])
-            if state.totalRooms > state.ocupiedRooms
-                e = Event(:serviceStart,t)
-            else
-                enqueue!(localQueue[1],patient,t)
-                stats.overview_usage[1] = t
-                stats.overview_usage[3] += 1
-                # CORRECT ? 
-            end 
-        else 
-            stats.overview_usage[1] = t
-            stats.overview_usage[3] += 1 
-            # Queuetimes? 
+    println("ArrivalPatient has started at time: $(state.t)")
+    
+    tt = state.t + rand(Exponential(env.arrivalRate_patient))
 
-        end 
+    
+    # Generate next arrival
+    if tt <= env.warmUpTime + env.timeHorizonH # Can be removed should work from the simulation 
 
-    elseif patient.type ==:Normal
-        if isempty(state.localQueue[1])
-            if isempty(state.localQueue[2])
+        if patient.type ==:High
+            #push!(stats.waitHigh,state.t) # ?! 
+            if isempty(state.localQueue[1])
+                println("No high patients in queue")
                 if state.totalRooms > state.ocupiedRooms
-                    e = Event(:serviceStart,t)
-                else 
-                    enqueue!(localQueue[2],patient,t)
-                    stats.overview_usage[1] = t
-                    stats.overview_usage[4] += 1 
+                    println("Available rooms")
+                    e = Event(:serviceStart,tt)
+                else
+                    enqueue!(localQueue[1],patient,tt)
+                    # stats.overview_usage[:,1] = tt
+                    # stats.overview_usage[:,3] += 1
                     # CORRECT ? 
                 end 
             else 
-                enqueue!(localQueue[2],patient,t)
-                stats.overview_usage[1] = t
-                stats.overview_usage[4] += 1 
-                # CORRECT ? 
+                # stats.overview_usage[:,1] = tt
+                # stats.overview_usage[:,3] += 1 
+                # Queuetimes? 
+
             end 
-            enqueue!(localQueue[2],patient,t)
-            stats.overview_usage[1] = t
-            stats.overview_usage[4] += 1 
-            # CORRECT ? 
-        end 
-        
-    else 
-        if isempty(state.localQueue[1])
-            if isempty(state.localQueue[2])
-                if isempty(state.localQueue[3])
+
+        elseif patient.type ==:Normal
+            if isempty(state.localQueue[1])
+                println("No high patients in queue")
+                if isempty(state.localQueue[2])
+                    println("No normal patients in queue")
                     if state.totalRooms > state.ocupiedRooms
-                        e = Event(:serviceStart,t)
+                        println("Available rooms")
+                        e = Event(:serviceStart,tt)
                     else 
-                        enqueue!(localQueue[3],patient,t)
-                        stats.overview_usage[1] = t 
-                        stats.overview_usage[5] += 1 
+                        enqueue!(localQueue[2],patient,tt)
+                        # stats.overview_usage[:,1] = tt
+                        # stats.overview_usage[:,4] += 1 
                         # CORRECT ? 
                     end 
                 else 
-                    enqueue!(localQueue[3],patient,t)
-                    stats.overview_usage[1] = t 
-                    stats.overview_usage[5] += 1 
+                    enqueue!(state.localQueue[2],patient,tt)
+                    # stats.overview_usage[:,1] = t
+                    # stats.overview_usage[:,4] += 1 
                     # CORRECT ? 
                 end 
-            else
-                enqueue!(localQueue[3],patient,t)
-                stats.overview_usage[1] = t 
-                stats.overview_usage[5] += 1 
+                enqueue!(state.localQueue[2],patient,tt)
+                # stats.overview_usage[:,1] = t
+                # stats.overview_usage[:,4] += 1 
                 # CORRECT ? 
             end 
+
         else 
-            enqueue!(localQueue[3],patient,t)
-            stats.overview_usage[1] = t 
-            stats.overview_usage[5] += 1 
-            # CORRECT ? 
+            if isempty(state.localQueue[1])
+                println("No high patients in queue")
+                if isempty(state.localQueue[2])
+                    println("No normal patients in queue")
+                    if isempty(state.localQueue[3])
+                        println("No low patients in queue")
+                        if state.totalRooms > state.ocupiedRooms
+                            println("Available rooms")
+                            e = Event(:serviceStart,tt)
+                        else 
+                            enqueue!(localQueue[3],patient,tt)
+                            # stats.overview_usage[:,1] = t 
+                            # stats.overview_usage[:,5] += 1 
+                            # CORRECT ? 
+                        end 
+                    else 
+                        enqueue!(localQueue[3],patient,tt)
+                        # stats.overview_usage[:,1] = t 
+                        # stats.overview_usage[:,5] += 1 
+                        # CORRECT ? 
+                    end 
+                else
+                    enqueue!(localQueue[3],patient,tt)
+                    # stats.overview_usage[:,1] = tt 
+                    # stats.overview_usage[:,5] += 1 
+                    # CORRECT ? 
+                end 
+            else 
+                enqueue!(localQueue[3],patient,tt)
+                # stats.overview_usage[:,1] = t 
+                # stats.overview_usage[:,5] += 1 
+                # CORRECT ? 
+            end 
         end 
-    end 
-
-
-
+        # New arrival ? 
+        
+    end
+    
 end
 
 
 
 #TO DO create this function
 function service_complete(env::Environment, state::State, stats::SimStats, events::PriorityQueue{Event,Float64}, t::Float64)
-       
+    # Check if there any patients to put in empty rooms 
 end
 
 #Both after an arrival, or a service completion, a new service can start (someone is admitted to the room). 
 #You can create this function for both these cases -- and call it at appropriate places in your code
 function serviceStart(env::Environment, state::State, events::PriorityQueue{Event,Float64}, stats::SimStats,patient::Patient,  t::Float64)
-   
+    
 end
 
 
@@ -165,9 +208,9 @@ function simulate(env::Environment, id::Int64)
     #Initialize the state of our process:
     localQueue = PriorityQueue{Patient,Float64}[] #Vector{PriorityQueue{Patient,Float64}}(PriorityQueue{Patient,Float64},3) 
     for i= 1:length(env.probDistrPatientType)
-    push!(localQueue, PriorityQueue{Patient,Float64}())
+        push!(localQueue, PriorityQueue{Patient,Float64}())
     end
-    state = State(0,env.nrRooms, localQueue)
+    state = State(0, 7,localQueue,0)
 
     #Create an empty statistics field (n_served, waitingTimeHigh[],waitingTimeNormal[], waitingTimeLow[], overview_usage, costsOfWaiting )
     #overview usage: [current time, nrocupiedRooms, QueueLengthHigh,QueueLengthNormal,QueueLengthLow]
@@ -179,11 +222,12 @@ function simulate(env::Environment, id::Int64)
     stats = SimStats(0,waitHigh, waitNormal, waitLow, overview_usage, costsOfWaiting)
     
     #Initialize first event :
-    t=0.0;
-    events = PriorityQueue{Event,Float64}()
-    nextArrival = t + env.arrivalRate_patient # TODO? 
-    e1 = Event(:ArrivalPatient,nextArrival)
-    enqueue!(events,e1,e1.time)
+    # t=0.0;
+    # events = PriorityQueue{Event,Float64}()
+    # nextArrival = t +rand(Exponential(env.arrivalRate_patient)) # TODO? 
+    # e1 = Event(:ArrivalPatient,nextArrival)
+    # enqueue!(events,e1,e1.time)
+    schedule_arrival(env,state)
     
     warmUp = true;
 
@@ -191,12 +235,12 @@ function simulate(env::Environment, id::Int64)
         e = dequeue!(events)
         t = e.time
         
-        if t>= env.warmUpTime+env.timeHorizonH
+        if t>= env.warmUpTime + env.timeHorizonH
             agregatedStats = printResults(stats, env, id)
             return agregatedStats
         end
 
-        if warmUp & (t >= env.warmUpTime)
+        if warmUp && (t >= env.warmUpTime)
             warmUp = false;
             waitHigh=Float64[]
             waitNormal=Float64[]
@@ -204,25 +248,24 @@ function simulate(env::Environment, id::Int64)
             costsOfWaiting = 0.0
             overview_usage = [t state.ocupiedRooms length(state.queue[1]) length(state.queue[2]) length(state.queue[3])]
             println("RESETTING. START OVERVIEW USAGE:", overview_usage)
-            stats = stats = SimStats(0,waitHigh, waitNormal, waitLow, overview_usage, costsOfWaiting)
+            stats = SimStats(0,waitHigh, waitNormal, waitLow, overview_usage, costsOfWaiting)
         end
 
-        if e.type==:ArrivalPatient
-            typePatient = rand(Uniform(0,1)) # Determine priority type 
-            if typePatient < env.probDistrPatientType[2]
-                patient = Patient(:Normal, t) 
-            elseif typePatient < (env.probDistrPatientType[3]+env.probDistrPatientType[2])
-                patient = Patient(:Low, t)
-            else 
-                patient = Patient(:High,t)
-            end 
-            arrival_patient(patient, env,state,event,stats,t)
-
-           #ToDo: select priority class for the patient "pPriority, e.g. ":High", ":Normal", or ":Low" 
-           #patient = Patient(pPriority, t) 
-           #TODO: program function: arrival_patient(patient, env,state,events,stats, t)and then execute the function "patient arrival"
+        if e.type==:ArrivalPatient 
+            # patient = Patient(:High,t) #Prob is 0.1
+            # probT = rand()
+            # println("Prob: ",probT)
+            # if probT <= 0.6 #Prob is 0.6
+            #     patient = Patient(:Normal,t)
+            # elseif probT <= 0.9 #Prob is 0.3
+            #     patient = Patient(:Low,t)
+            # end
+            arrival_patient(patient, env,state,events,stats,t)
+            #ToDo: select priority class for the patient "pPriority, e.g. ":High", ":Normal", or ":Low" 
+            #patient = Patient(pPriority, t) 
+            #TODO: program function: arrival_patient(patient, env,state,events,stats, t)and then execute the function "patient arrival"
         elseif e.type==:ServiceComplete
-                #Todo: program the fuunction "service_complete(env, state, stats, events, t)"
+            #Todo: program the function "service_complete(env, state, stats, events, t)"
         end
     end
     #Print Results to file
@@ -262,7 +305,7 @@ println( "Average Waiting Time Normal", avWNorm)
 println( "Average Waiting Time Low", avWLow)
 
 #print detailed stats results to file, so you can review and analyze also later
-open("C:/Users/evdh/OneDrive - Danmarks Tekniske Universitet/Teaching/DecisionUnderUncertainty/Simulation/resultsHospital$id.txt","a") do io
+open("C:/Users/buurd/OneDrive/Dokumenter/GitHub/Decisions/results_discrete$id.txt","a") do io
     println(io, "nrServed ", stats.n_served)
     println(io, "Costs of Waiting ", stats.costsOfWaiting)
     println(io, "Average Room Occupation: " , averageRoomOccupation)
@@ -285,7 +328,7 @@ end
 
 function printToFile(aggregatedStats)
     #print detailed stats results to file, so you can review and analyze also later
-open("C:/Users/evdh/OneDrive - Danmarks Tekniske Universitet/Teaching/DecisionUnderUncertainty/Simulation/resultsHospitalAggregated.txt","a") do io
+open("C:/Users/buurd/OneDrive/Dokumenter/GitHub/Decisions/results_aggregated.txt","a") do io
     println(io, aggregatedStats)
  end
 end
@@ -319,7 +362,7 @@ function main()
     #1. Environment   
     env = Environment(
         weeksSimTime*24*7, #6 weeks '
-        weeksWarmUp*24*7,
+        weeksWarmUp*24*7, # 2 weeks warmup
         base,
         arrivalRate,
         probPerPatientType,
@@ -327,7 +370,6 @@ function main()
         totalRooms, 
         costsPerPatientType
         ) 
-
     totalSimulations = 1;
     curRun = 0
     overallStats=Array{Float64,2}
@@ -348,6 +390,6 @@ function main()
 end
 
 main()
-end
+#end
 
 
