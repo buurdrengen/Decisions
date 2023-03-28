@@ -83,3 +83,30 @@ for i=1:3
     push!(localc, PriorityQueue{Tuple,Float64}())
 end 
 println(localc)
+
+
+
+using Distributions
+using Random
+n = 10
+mu = 40
+sigma = 15
+A = zeros((n,n))
+#low = quantile(Normal(0.0, 1.0),1-(1+0.95)/2)
+upper = quantile(Normal(0.0, 1.0),1-(1-0.95)/2)
+vect = Vector{Float64}()
+for j in 1:n
+    for i in 1:n
+        draw = rand(Normal(mu,sigma),1)
+        println("Draw = ",draw)
+        push!(vect,draw)
+    end
+    mean = mean(vect)
+    std = std(vect)
+    conf1 = mean - (upper*std)/n
+    conf2 = mean + (upper*std)/n
+    push!(A[2,:],mean)
+    push!(A[1,:],conf1)
+    push!(A[3,:],conf2)
+end
+println(A)
